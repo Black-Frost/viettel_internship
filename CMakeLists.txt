@@ -8,8 +8,6 @@ set(OUTPUT_FOLDER "bin")
 # output file exe location
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../${OUTPUT_FOLDER})
 
-message(${CMAKE_CXX_COMPILER_ID})
-message(${MSVC})
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 # using Clang
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
