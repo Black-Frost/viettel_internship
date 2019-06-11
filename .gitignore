@@ -450,3 +450,4 @@ MigrationBackup/
 build/
 bin/
 out/
+!week2/**/*
