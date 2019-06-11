@@ -18,36 +18,23 @@ Application type: Console
 
 enum bee_t {WORKER, QUEEN, DRONE};
 
+const char* worker = "worker";
+const char* queen = "queen";
+const char* drone = "drone";
+
 class Bee {
   public:
     Bee() {}
+    virtual ~Bee() = default;
 
-    void Damage(int percentage) {
-      if (percentage < 0 || percentage > 80)
-        return;
-      if (!this->_isDead)
-        this->health -= this->health * ((float)percentage / 100);
-      if (this->health < this->deadThreshold)
-        _isDead = true;
-    }
+    virtual const char* type() = 0;
+    virtual void damage(float percentage) = 0;
 
     const float& fetchHealth() const {
       return this->health;
     }
     const bool& isDead() const {
       return this->_isDead;
-    }
-    const char* type() const {
-      switch (this->_type) {
-        case WORKER:
-          return "worker";
-        case QUEEN:
-          return "queen";
-        case DRONE:
-          return "drone";
-        default:
-          return "bee";
-      }
     }
     float isAlive() {
       return !this->_isDead;
@@ -56,31 +43,57 @@ class Bee {
   protected:
     bool _isDead = false;
     float health = 100;
-    float deadThreshold;
-    enum bee_t _type;
 };
 
 class Worker : public Bee {
   public:
-  Worker() {
-    deadThreshold = 70;
-    _type = WORKER;
+  void damage(float percentage) {
+    if (percentage < 0 || percentage > 80)
+        return;
+    if (!this->_isDead)
+        this->health -= this->health * ((float)percentage / 100);
+    if (this->health < 70)
+        _isDead = true;
+  }
+
+  const char* type() {
+    return worker;
   }
 };
 
 class Queen : public Bee {
   public:
+  void damage(float percentage) {
+    if (percentage < 0 || percentage > 80)
+      return;
+    if (!this->_isDead)
+      this->health -= this->health * ((float)percentage / 100);
+    if (this->health < 20)
+      _isDead = true;
+  }
+  const char* type() {
+    return queen;
+  }
+
   Queen() {
-    deadThreshold = 20;
-    _type = QUEEN;
   }
 };
 
 class Drone : public Bee {
   public:
+  void damage(float percentage) {
+    if (percentage < 0 || percentage > 80)
+      return;
+    if (!this->_isDead)
+      this->health -= this->health * ((float)percentage / 100);
+    if (this->health < 50)
+      _isDead = true;
+  }
+  const char* type() {
+    return drone;
+  }
+
   Drone() {
-    deadThreshold = 50;
-    _type = DRONE;
   }
 };
 
@@ -145,7 +158,6 @@ void print_bee_list() {
 void create_bee_list() {
   for (int i = 0; i < bee_count; i++) {
     delete bee_list[i];
-    // bee_t beetype = (bee_t)(rand() % 3);
     bee_t beetype = (bee_t)(i / 10);
     Bee* bee;
     switch (beetype) {
@@ -168,6 +180,6 @@ void create_bee_list() {
 void attack_bee_list() {
   for (int i = 0; i < bee_count; i++) {
     int percent = rand() % 81;
-    bee_list[i]->Damage(percent);
+    bee_list[i]->damage(percent);
   }
 }
