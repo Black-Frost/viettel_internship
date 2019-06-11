@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     printf("LIBRARY\n");
     printf("1. add a book\n");
     printf("2. delete a book\n");
-	printf("3. exit");
+	printf("3. exit\n");
     printf(">> ");
     s = scanf("%d", &choice);
     if (s != 1) {
