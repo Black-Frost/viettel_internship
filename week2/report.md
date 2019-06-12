@@ -372,7 +372,7 @@ You could verify the result on [godbolt](https://godbolt.org/z/AJdbb3). It shoul
 References:
 - [Dịch ngược chương trình hướng đối tượng](https://tradahacking.vn/d%E1%BB%8Bch-ng%C6%B0%E1%BB%A3c-ch%C6%B0%C6%A1ng-tr%C3%ACnh-h%C6%B0%E1%BB%9Bng-%C4%91%E1%BB%91i-t%C6%B0%E1%BB%A3ng-c49198c364e2)
 - [Reversing C++ Virtual Functions 1 & 2](https://alschwalm.com/blog/static/2016/12/17/reversing-c-virtual-functions/)
-- [Blackhat Reversing C++](Reversing C++ Virtual Functions)
+- [Blackhat Reversing C++](https://www.blackhat.com/presentations/bh-dc-07/Sabanal_Yason/Paper/bh-dc-07-Sabanal_Yason-WP.pdf)
 
 ## Other compiler stuffs
 
