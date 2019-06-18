@@ -55,13 +55,18 @@ endforeach()
 # set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/${DEBUG_FOLDER}")
 endif()
 
-
+# WEEK 1
 add_executable(calculator week1/calculator.c)
 add_executable(arrays week1/arrays.cpp)
 add_executable(thuvien week1/thuvien.c)
 add_executable(bee week1/bee.cpp)
-
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 add_executable(calculator_ASM week1/calculator_ASM.cpp)
-add_executable(spy_malware WIN32 week3/screenshot.cpp)
+endif()
+
+# WEEK 3
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+add_library(sss SHARED week3/sss.cpp)
+add_executable(trojan_sss week3/trojan_sss.cpp)
+# target_link_libraries(trojan_sss sss)
 endif()
