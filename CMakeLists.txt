@@ -63,4 +63,5 @@ add_executable(bee week1/bee.cpp)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 add_executable(calculator_ASM week1/calculator_ASM.cpp)
+add_executable(spy_malware WIN32 week3/screenshot.cpp)
 endif()
