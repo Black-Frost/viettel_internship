@@ -70,3 +70,17 @@ add_library(sss SHARED week3/sss.cpp)
 add_executable(trojan_sss week3/trojan_sss.cpp)
 # target_link_libraries(trojan_sss sss)
 endif()
+
+# WEEK 4
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+add_executable(IsDebuggerPresent week4/Anti-Debug/IsDebuggerPresent.cpp)
+add_executable(PEBBeingDebugged week4/Anti-Debug/PEBBeingDebugged.cpp)
+add_executable(PEBNtGlobalFlag week4/Anti-Debug/PEBNtGlobalFlag.cpp)
+add_executable(PEBProcessHeap week4/Anti-Debug/PEBProcessHeap.cpp)
+add_executable(CheckRemoteDebuggerPresent week4/Anti-Debug/CheckRemoteDebuggerPresent.cpp)
+add_executable(NtQueryInformationProcess week4/Anti-Debug/NtQueryInformationProcess.cpp)
+add_executable(SEH week4/Anti-Debug/SEH.cpp)
+add_executable(VEH week4/Anti-Debug/VEH.cpp)
+endif()
+
+# vim: set noautoindent
