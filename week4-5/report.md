@@ -5,7 +5,7 @@
 
 In these two weeks the task given are unpacking simple packers, and researching on some common anti debugging and anti virtualization.
 
-> I also went on to find two CTF challenges that uses these techniques. But the report is unable to finish with these secion ontime. There will be modifications, additions, if possible.
+> I also went on to find two CTF challenges that uses these techniques. But the report is unable to finish with this secion ontime. There will be modifications, additions, if possible.
 
 ## Unpacking simple packer
 
@@ -15,9 +15,11 @@ The packer samples are the three common UPX, PeCompact, and ASPack. The idea is 
 
 Disecting the section of a packed UPX executable, we can see that it does not have common section like `.text` nor `.data` but instead, `UPX0`, and `UPX1`. We can see that the section `UPX0` has a virtual size of 0x00044000 but the raw size is 0x00000000. This probaly the section where the code is extracted to. UPX is a simple packer that does not prevent debugging or anything, so unpacking should be easy.
 
+![virtual and raw size](virtualsize_rawsize.png)
+
 On running the binary, we will detect code looping many times, in this one specific loop we can see that the arguments loaded to call are changed each time and the names are library names.
 
-> TODO: Add picture
+![resolve import](resolveImport.png)
 
 If we keep stepping, soon we will jump to where our real code is. At this time, we can extract the binary from memory which to be discussed later.
 
@@ -25,13 +27,13 @@ Another way to find the real code is to ultilize the `pushad` and `popad` instru
 
 Another way to find the real code is using the ESP trick. When `pushad` is called, the registers are push to the stack, and will be poped out on `popad`. The trick is to watch for the value of register if they are accessed. The order of register when push is `EAX, ECX, EDX, EBX, EBP, ESP, EBP, ESI, EDI`. We will monitor this address space to see if it get accessed, poped out. The moment the address for these is use is just right after `popad`. Stepping a few more and we hit our real code.
 
-> TODO: Add picture
+![popad](popad_jump.png)
 
 ### PeCompact
 
 PeCompact does not use `pushad` and `popad`, but using Exception Handler to jump to the decompressing code. What special about Exception Handler is that when debugging the debugger will catch the exception. In the image below, the `eax` register is having the value `0x00000000` and the `EIP` is at `mov dword ptr ds:[eax], ecx`. The address at `0x00000000` is not accessible, so when this command is executed, an exception is thrown. When debugging, the debugger will catch the exception and we cannot go into the exception handler. I have tried to debug with Ollydbg but to no avail, while using x32dbg we can press `Shift+F7` to pass the exception to program. In Ollydbg, we can set break point on SEH but instructions are not correct and cannot debug to find the real code. In x32dbg we can find the real code just by stepping forward.
 
-> TODO: The differences when debug using x32dbg and Ollydbg
+![ollydbg\_x32dbg](ollydbg_x32dbg.png)
 
 ### ASPack
 
@@ -76,7 +78,7 @@ __kernel_entry NTSTATUS NtQueryInformationProcess(
 );
 ```
 
-The most common API is `NtQueryInformationProcess`, this API was not documented in the official Windows documentation, but later [includes](https://docs.microsoft.com/en-us/windows/desktop/api/winternl/nf-winternl-ntqueryinformationprocess) but we cannot use. If we tried to directly call `NtQueryInformationProcess`, it will throw an error of `unknown import` when compiling. We can still call the function by write a function pointer for it and call, or call it in assembly.
+The most common API is `NtQueryInformationProcess`, this API was not documented in the official Windows documentation, but later [included](https://docs.microsoft.com/en-us/windows/desktop/api/winternl/nf-winternl-ntqueryinformationprocess) but we cannot use. If we tried to directly call `NtQueryInformationProcess`, it will throw an error of `unknown import` when compiling. We can still call the function by write a function pointer for it and call, or call it in assembly.
 
 ```cpp
 int main(int argc, char** argv) {
@@ -222,8 +224,8 @@ SEH exception are set using `fs:[0]`, the routine is as follows:
 push ExceptionHandlerFunction
 push dword ptr fs:[0]
 mov dword ptr fs:[0], esp
-# normal code
-# unset exception handler if necessary
+; normal code
+; unset exception handler if necessary
 ```
 
 In both Ollydbg and x32dbg, we can see the SEH list, when we detect a new SEH function, put a breakpoint to prevent the program running past the exception handler.
@@ -316,12 +318,12 @@ Lists taken from [al-khaser](https://github.com/LordNoteworthy/al-khaser) and [c
 When running inside VMWare, machine has to communicate with the host. A reverse engineer has found the port and publicly [announced](https://sites.google.com/site/chitchatvmback/backdoor) it, the port is called a backdoor I/O port. We can use `in` instruction to read from the port and expect the result.
 
 ```asm
-mov eax, 0x564d5868   # magic number
-mov ebx, 0            # function param
-mov ecx, 0xA          # function id
-mov edx, 5658         # VMWare I/O Port
-in eax, dx            # try to communicate
-# cmp ...
+mov eax, 0x564d5868   ; magic number
+mov ebx, 0            ; function param
+mov ecx, 0xA          ; function id
+mov edx, 5658         ; VMWare I/O Port
+in eax, dx            ; try to communicate
+; cmp ...
 ```
 
 The above code will call the function with id `0xA`, fetch VMWare version number, and return the result on `eax, ebx, ecx`. Some other command are also useful.
