@@ -48,7 +48,7 @@ When we find the real code, we can now dump the binary out. However, the dumped 
 
 Anti-debugging is a technique to somehow detect debuggers. The main goal is to prevent others people reversing the program. These technique often can be bypass if we have found where the call is made because it is often followed by a jump to exit code. Patching the jump to bypass the check.
 
-```asm
+```nasm
 call CheckDebugger
 test eax, eax
 jne ExitCode
@@ -120,7 +120,7 @@ debuggerfound:
 
 One of the most common way to detect if the program is run in a debugger is to query the information from the [PEB structure](https://www.aldeid.com/wiki/PEB-Process-Environment-Block) of the process. This structure is located inside of the [TEB structure](https://www.aldeid.com/wiki/TEB-Thread-Environment-Block) stores information about the threads. TEB is always at the `fs` segment of the process, looking at the offset, PEB is at 0x30 of TEB. The assembly for getting the PEB is:
 
-```asm
+```nasm
 lea eax, dword ptr fs:[30]
 ```
 
@@ -220,7 +220,7 @@ Manipulating registers when throwing an exception and check if the value is corr
 
 SEH exception are set using `fs:[0]`, the routine is as follows:
 
-```asm
+```nasm
 push ExceptionHandlerFunction
 push dword ptr fs:[0]
 mov dword ptr fs:[0], esp
@@ -317,7 +317,7 @@ Lists taken from [al-khaser](https://github.com/LordNoteworthy/al-khaser) and [c
 
 When running inside VMWare, machine has to communicate with the host. A reverse engineer has found the port and publicly [announced](https://sites.google.com/site/chitchatvmback/backdoor) it, the port is called a backdoor I/O port. We can use `in` instruction to read from the port and expect the result.
 
-```asm
+```nasm
 mov eax, 0x564d5868   ; magic number
 mov ebx, 0            ; function param
 mov ecx, 0xA          ; function id

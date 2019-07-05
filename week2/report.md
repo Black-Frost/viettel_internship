@@ -21,7 +21,7 @@ It it supprising that IDA was not able to recognize our `void main(int argc, cha
 
 The arguments are pushed on stack (exception on float/double arguments) from last to first arguments. `void foo(int a, int b, int c);` will be push on stack by order:
 
-```asm
+```nasm
 push c
 push b
 push a
@@ -78,7 +78,7 @@ With stack pointer is `esp`, we can calculate the address of `var_a, var_b, var_
 
 The use of `ebp` is to offset to variables, arguments, and return address. Using `ebp` will simplify the offset, as `var_a, var_b, var_c, ret_addr, arg_d, arg_e` offset will be the same regardless of how `esp` move when pushing, poping. The routine will be as follow:
 
-```asm
+```nasm
 main:
   ; main function
   push arg_e
@@ -184,7 +184,7 @@ add_book() {
 
 Even in disassembly view:
 
-```asm
+```nasm
 ; delete book
 mov     eax, [ebp+b]
 mov     [eax+book.inUse], 0
@@ -213,7 +213,7 @@ void print_array(T* arr, size_t len);
 
 And we use these three functions for three types of `char, short, int`. The compiled result, are three different functions, as can be seen below, are the calls to `gen_random(T* arr, size_t len)`.
 
-```asm
+```nasm
 push    3               ; a2
 lea     eax, [ebp+char_arr]
 push    eax             ; a1
@@ -232,7 +232,7 @@ call    j_template_dword_array_gener
 
 The different part in three functions is only
 
-```asm
+```nasm
 ; char
 call    rand
 add     esp, 8
@@ -356,7 +356,7 @@ The struct for the three class lying under assembly could be:
 Because of this, we often see a call to register, either `eax, ecx, esi`, or register offset. Because it will assign the virtual function table to the class.
 
 Example of calling talk function, compiled on my `x86_64` machine using `g++ 8.3.0`.
-```asm
+```nasm
 ; var_28h is Animal* dog
 mov rax, qword [var_28h]        ; rax = dog address
 mov rax, qword [rax]            ; move [dog+0] = vfptr to rax
@@ -378,7 +378,7 @@ References:
 
 When dividing a number to 10, the compiler do a magic operation to compute faster:
 
-```asm
+```nasm
 mov edx, 0xcccccccd
 mov eax, [var]
 mul edx
