@@ -1,5 +1,6 @@
-const http = require('http')
-const port = 3000
+const http = require('http');
+const fs = require('fs');
+const hacked_binary = fs.readFileSync('./freenki_hack');
 
 const encrypt = (m) => Buffer.from(m, 'utf16le').map(x => (x ^ 0x21) + 0x0f);
 
@@ -130,16 +131,11 @@ const requestHandler = (request, response) => {
 
   console.log('================INCOMMING REQUEST===============');
   console.log(request.method + ":" + request.url);
+  console.log(request.headers);
 
   if (request.url == '/hello_world') {
-    let msg = []
-    for (let k = 0; k < 3; k++)
-      for (let i = 0x61; i <= 0x7a; i++)
-        for (let j = 0; j < 4; j++)
-          msg.push(i)
-    payload = encrypt('some thing malicious alkdjflasdkjflakdjsflkajsdfkjasdlkfjlsdajflasdkjflkaksjdflkajdlfkjalsdjflasdkjflasdkjflkadsjflasdjflajdsfkjasldkjfalsdjflkaksjdflkkajdlfkjalkdfjalksdjflsdajaf');
-    res = 'PNGF' + parity(payload) + payload;
-    response.write(res);
+    payload = encrypt(hacked_binary);
+    response.write('PNGF' + parity(payload) + payload);
     response.end();
     return;
   }
@@ -175,12 +171,12 @@ const requestHandler = (request, response) => {
   });
 }
 
+const port = 3000;
 const server = http.createServer(requestHandler)
-
 server.listen(port, (err) => {
   if (err) {
     return console.log('something bad happened', err)
   }
 
   console.log(`server is listening on ${port}`)
-}) 
+});

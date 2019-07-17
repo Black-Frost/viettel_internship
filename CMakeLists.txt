@@ -83,4 +83,9 @@ add_executable(SEH week4/Anti-Debug/SEH.cpp)
 add_executable(VEH week4/Anti-Debug/VEH.cpp)
 endif()
 
+# WEEK 6
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+add_executable(freenki_hacked week6/hacked.cpp)
+endif()
+
 # vim: set noautoindent
