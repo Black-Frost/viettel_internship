@@ -1,10 +1,9 @@
 const http = require('http');
 const fs = require('fs');
-const hacked_binary = fs.readFileSync('./freenki_hack');
 
 const encrypt = (m) => Buffer.from(m, 'utf16le').map(x => (x ^ 0x21) + 0x0f);
 
-const decrypt = (c) => c.map(x => (x - 0x0f) ^ 0x21).toString();
+const decrypt = (c) => c.map(x => (x - 0x0f) ^ 0x21);
 
 function reverseInplace (buffer) {
   for (var i = 0, j = buffer.length - 1; i < j; ++i, --j) {
@@ -123,9 +122,17 @@ const parity = (m) => {
   for (; i < m.length; i++)
     parity_bit ^= m[i];
 
+  // console.log(m);
+  console.log(parity_bit.toString(16))
   return Buffer.from(parity_bit.toString(16), 'hex');
 }
 
+
+const hacked_binary = Buffer.from(fs.readFileSync('./freenki_hacked.exe', { encoding: 'hex' }), 'hex');
+
+console.log(hacked_binary);
+console.log(encrypt(hacked_binary));
+console.log(Buffer.from(decrypt(encrypt(hacked_binary))));
 
 const requestHandler = (request, response) => {
 
@@ -135,7 +142,9 @@ const requestHandler = (request, response) => {
 
   if (request.url == '/hello_world') {
     payload = encrypt(hacked_binary);
-    response.write('PNGF' + parity(payload) + payload);
+    msg = Buffer.concat([Buffer.from('PNGF'), parity(payload), payload]);
+    console.log('=> ' + msg);
+    response.write(msg);
     response.end();
     return;
   }
@@ -156,7 +165,7 @@ const requestHandler = (request, response) => {
     mac = body.slice(1, 2*6);
 
     console.log(code + " " + mac);
-    if (code !== '4') console.log(decrypt(data));
+    if (code !== '4') console.log(decrypt(data).toString());
 
     response.statusCode = 200;
     let msg;
@@ -166,6 +175,7 @@ const requestHandler = (request, response) => {
       msg = encrypt('1http://old.jrchina.com/hello_world\r\n\0');
     else
       msg = encrypt('dummy\0');
+    console.log('=> ' + msg);
     response.write(msg);
     response.end();
   });
