@@ -4,6 +4,6 @@
 int APIENTRY
 WinMain( HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmdShow )
 {
-  MessageBox( NULL, "Freenki", "You've been hacked", MB_ICONINFORMATION);
+  MessageBox( NULL, "You've been hacked", "Freenki", MB_ICONINFORMATION);
   return 0;
 }

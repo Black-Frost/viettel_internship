@@ -73,19 +73,19 @@ endif()
 
 # WEEK 4
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-add_executable(IsDebuggerPresent week4/Anti-Debug/IsDebuggerPresent.cpp)
-add_executable(PEBBeingDebugged week4/Anti-Debug/PEBBeingDebugged.cpp)
-add_executable(PEBNtGlobalFlag week4/Anti-Debug/PEBNtGlobalFlag.cpp)
-add_executable(PEBProcessHeap week4/Anti-Debug/PEBProcessHeap.cpp)
-add_executable(CheckRemoteDebuggerPresent week4/Anti-Debug/CheckRemoteDebuggerPresent.cpp)
-add_executable(NtQueryInformationProcess week4/Anti-Debug/NtQueryInformationProcess.cpp)
-add_executable(SEH week4/Anti-Debug/SEH.cpp)
-add_executable(VEH week4/Anti-Debug/VEH.cpp)
+add_executable(IsDebuggerPresent week4-5/Anti-Debug/IsDebuggerPresent.cpp)
+add_executable(PEBBeingDebugged week4-5/Anti-Debug/PEBBeingDebugged.cpp)
+add_executable(PEBNtGlobalFlag week4-5/Anti-Debug/PEBNtGlobalFlag.cpp)
+add_executable(PEBProcessHeap week4-5/Anti-Debug/PEBProcessHeap.cpp)
+add_executable(CheckRemoteDebuggerPresent week4-5/Anti-Debug/CheckRemoteDebuggerPresent.cpp)
+add_executable(NtQueryInformationProcess week4-5/Anti-Debug/NtQueryInformationProcess.cpp)
+add_executable(SEH week4-5/Anti-Debug/SEH.cpp)
+add_executable(VEH week4-5/Anti-Debug/VEH.cpp)
 endif()
 
 # WEEK 6
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-add_executable(freenki_hacked week6/hacked.cpp)
+add_executable(freenki_hacked WIN32 week6/hacked.cpp)
 endif()
 
 # vim: set noautoindent
